@@ -1,0 +1,15 @@
+/bin/
+/lib/
+/.gradle/
+/.idea/
+/app/src/main/assets/
+/app/src/main/res/drawable
+/app/src/main/res/layout
+/app/src/main/res/menu
+/gradle/
+/build/
+*.properties
+*.OBJ
+*.alloc
+/hw03/hw3_mnist_dist/
+/hw03/hw3_spam_dist/
