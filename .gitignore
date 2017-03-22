@@ -13,3 +13,7 @@
 *.alloc
 /hw03/hw3_mnist_dist/
 /hw03/hw3_spam_dist/
+*.csv
+*.mat
+*.txt
+*.pdf
