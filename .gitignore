@@ -17,3 +17,5 @@
 *.mat
 *.txt
 *.pdf
+*.ham
+*.spam
