@@ -3,6 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 from random import shuffle
+import operator
 
 import argparse
 import sys
@@ -21,6 +22,8 @@ def readInData(fname):
   content = [x.strip() for x in content] 
   
   commandsById = dict()
+  id = 0
+  
   result = []
   workingOnCommand = False
   currentArr = []
@@ -33,6 +36,8 @@ def readInData(fname):
       if not workingOnCommand: #beginning a new command
         if len(currentArr) > 0: #ignore leading spaces that don't actually signal ends of sentence groups
           result.append(currentArr)
+          commandsById[id] = text.split()[0]
+          id += 1
         currentArr = []
         workingOnCommand = True
       else: #adding sentences to a certain command
@@ -40,10 +45,25 @@ def readInData(fname):
     
   if len(currentArr) > 0: #append the last set of sentences if not properly closed
     result.append(currentArr)
-       
+    commandsById[id] = text.split()[0]
+    id += 1
+    
   f.close()     
        
-  return result     
+  return result, commandsById     
+       
+def encodeSentence(wordMap, sentence):
+  stemmer = PorterStemmer()
+  sentenceSanitized = sentence.lower().strip(',.!?') #.replace(r"\(.*\)","")
+  words = sentenceSanitized.split()
+  stemmedWords = [stemmer.stemword(word) for word in words]
+  result = [0 for _ in range(len(wordMap))]
+  for stemmedWord in stemmedWords:
+    if stemmedWord not in wordMap:
+      continue
+    id = wordMap[stemmedWord]
+    result[id] = 1
+  return result
        
 def convertSentencesToVector(arrSentences):
   stemmer = PorterStemmer()
@@ -75,7 +95,7 @@ def convertSentencesToVector(arrSentences):
         id = uniqueWordsDict[stemmedWord]
         processedSentences[i][j].append(id)
   
-  return processedSentences, len(uniqueList)
+  return processedSentences, len(uniqueList), uniqueWordsDict
    
 def zeroOneEncode(processedSentences, size):
   results = [[] for _ in range(len(processedSentences))]
@@ -119,7 +139,7 @@ def customSoftmaxTrain(dataX, dataLabels, numClasses):
   sess = tf.InteractiveSession()
   tf.global_variables_initializer().run()
   # Train
-  for _ in range(50):
+  for _ in range(30):
     #batch_xs, batch_ys = mnist.train.next_batch(20)
     batch_xs, batch_ys = randomBatch(dataX, dataLabels, 20)
     sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})        
@@ -128,6 +148,13 @@ def customSoftmaxTrain(dataX, dataLabels, numClasses):
   correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
   accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
   print(sess.run(accuracy, feed_dict={x: dataX, y_: dataLabels}))  
+  
+  #batchX, batchY = randomBatch(dataX, dataLabels, 20)
+  #feed_dict = {x: [batchX[0]]}
+  #classification = y.eval(feed_dict)
+  #print(classification)
+  
+  return x, y
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
@@ -136,9 +163,9 @@ if __name__ == '__main__':
   
   #tf.app.run(main=main, argv=[])
   
-  fileSentences = readInData("./commands_train.txt")
+  fileSentences, commandsById = readInData("./commands_train.txt")
   numClasses = len(fileSentences)
-  results, length = convertSentencesToVector(fileSentences)
+  results, length, wordMap = convertSentencesToVector(fileSentences)
   zeroOneVector = zeroOneEncode(results, length)
   
   labels = []
@@ -154,11 +181,20 @@ if __name__ == '__main__':
       vector = zeroOneVector[i][j]
       allZeroOneVectors.append(vector)
   
-  customSoftmaxTrain(allZeroOneVectors, labels, numClasses)
+  trainedCommandModelX, trainedCommandModelY = customSoftmaxTrain(allZeroOneVectors, labels, numClasses)
   
+  testX = [encodeSentence(wordMap, "Please show a list of finance.")]
+  #testX = [encodeSentence(wordMap, "Research on Wikipedia the following topic.")]
+  feed_dict = {trainedCommandModelX: testX}
+  classification = trainedCommandModelY.eval(feed_dict)
+  #print(classification)
   
+  classificationLabels = {commandsById[i]: classification[0][i] for i in range(len(classification[0]))}
+  sortedClassificationLabels = sorted(classificationLabels.items(), key=operator.itemgetter(1), reverse=True)
   
+  print(sortedClassificationLabels)
   
+  #print(commandsById)
   
   
   
