@@ -16,6 +16,16 @@ FLAGS = None
 
 #TODO: Create a new data set for the sentences
 
+commonWords = []
+
+def readCommonWords(fname):
+  with open(fname) as f:
+    content = f.readlines()
+  content = [x.strip() for x in content] 
+  contentParsed = [text for text in content if len(text) > 0]
+  f.close()
+  return contentParsed
+
 def readInData(fname):
   with open(fname) as f:
     content = f.readlines()
@@ -36,14 +46,14 @@ def readInData(fname):
       if not workingOnCommand: #beginning a new command
         if len(currentArr) > 0: #ignore leading spaces that don't actually signal ends of sentence groups
           result.append(currentArr)
-          commandsById[id] = text.split()[0]
-          id += 1
+        commandsById[id] = text.split()[0]
+        id += 1
         currentArr = []
         workingOnCommand = True
       else: #adding sentences to a certain command
         currentArr.append(text)
     
-  if len(currentArr) > 0: #append the last set of sentences if not properly closed
+  if len(currentArr) > 0: #append the last set of sentences if not properly closed by an empty line
     result.append(currentArr)
     commandsById[id] = text.split()[0]
     id += 1
@@ -79,6 +89,8 @@ def convertSentencesToVector(arrSentences):
       stemmedWords = [stemmer.stemword(word) for word in words]
       stemmedSplit[i].append(stemmedWords)
       for stemmedWord in stemmedWords:
+        if stemmedWord in commonWords:
+          continue
         uniqueWords.add(stemmedWord)
         
   uniqueList = list(uniqueWords)
@@ -92,6 +104,8 @@ def convertSentencesToVector(arrSentences):
       processedSentences[i].append([])
       processedSentence = []
       for stemmedWord in stemmedWords:
+        if stemmedWord in commonWords:
+          continue
         id = uniqueWordsDict[stemmedWord]
         processedSentences[i][j].append(id)
   
@@ -141,7 +155,7 @@ def customSoftmaxTrain(dataX, dataLabels, numClasses):
   # Train
   for _ in range(30):
     #batch_xs, batch_ys = mnist.train.next_batch(20)
-    batch_xs, batch_ys = randomBatch(dataX, dataLabels, 20)
+    batch_xs, batch_ys = randomBatch(dataX, dataLabels, 100)
     sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})        
     
   # Test trained model
@@ -163,6 +177,7 @@ if __name__ == '__main__':
   
   #tf.app.run(main=main, argv=[])
   
+  commonWords = readCommonWords("./common_words.txt")
   fileSentences, commandsById = readInData("./commands_train.txt")
   numClasses = len(fileSentences)
   results, length, wordMap = convertSentencesToVector(fileSentences)
@@ -183,7 +198,7 @@ if __name__ == '__main__':
   
   trainedCommandModelX, trainedCommandModelY = customSoftmaxTrain(allZeroOneVectors, labels, numClasses)
   
-  testX = [encodeSentence(wordMap, "Please show a list of finance.")]
+  testX = [encodeSentence(wordMap, "Please show my finances.")]
   #testX = [encodeSentence(wordMap, "Research on Wikipedia the following topic.")]
   feed_dict = {trainedCommandModelX: testX}
   classification = trainedCommandModelY.eval(feed_dict)
