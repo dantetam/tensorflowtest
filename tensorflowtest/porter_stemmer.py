@@ -344,7 +344,7 @@ class PorterStemmer:
         return self.b[self.k0:self.k+1]
 
     def stemword(self, p):
-        return self.stem(p, 0, len(p))
+        return self.stem(p, 0, len(p) - 1)
         
 if __name__ == '__main__':
     p = PorterStemmer()
@@ -365,5 +365,5 @@ if __name__ == '__main__':
                             output += p.stem(word, 0,len(word)-1)
                             word = ''
                         output += c.lower()
-                print output,
+                #print output,
             infile.close()

@@ -16,17 +16,13 @@ FLAGS = None
 #TODO: Create a new data set for the sentences
 
 def readInData(fname):
-  stemmer = PorterStemmer()
-
   with open(fname) as f:
     content = f.readlines()
   content = [x.strip() for x in content] 
   
   commandsById = dict()
   result = []
-  
   workingOnCommand = False
-  
   currentArr = []
   
   for text in content:
@@ -44,10 +40,51 @@ def readInData(fname):
        
   return result     
        
-        sentence = text.strip(',.!?').replace(r"\(.*\)","")
-        words = sentence.split()
-        stemmedWords = [stemmer.stemword(word) for word in words]
-        currentArr.append(stemmedWords)
+def convertSentencesToVector(arrSentences):
+  stemmer = PorterStemmer()
+  uniqueWords = set()
+  
+  stemmedSplit = [[] for _ in range(len(arrSentences))]
+  
+  for i in range(len(arrSentences)):
+    arrSentence = arrSentences[i]
+    for sentence in arrSentence:
+      sentence = sentence.lower().strip(',.!?').replace(r"\(.*\)","")
+      words = sentence.split()
+      stemmedWords = [stemmer.stemword(word) for word in words]
+      stemmedSplit[i].append(stemmedWords)
+      for stemmedWord in stemmedWords:
+        uniqueWords.add(stemmedWord)
+        
+  uniqueList = list(uniqueWords)
+  uniqueWordsDict = {uniqueList[i]: i for i in range(len(uniqueList))}
+  
+  processedSentences = [[] for _ in range(len(stemmedSplit))]
+  
+  for i in range(len(stemmedSplit)):
+    for j in range(len(stemmedSplit[i])):
+      stemmedWords = stemmedSplit[i][j]
+      processedSentences[i].append([])
+      processedSentence = []
+      for stemmedWord in stemmedWords:
+        id = uniqueWordsDict[stemmedWord]
+        processedSentences[i][j].append(id)
+   
+  print(processedSentences[0])
+  
+  return processedSentences, len(uniqueList)
+   
+def zeroOneEncode(processedSentences, size):
+  results = [[] for _ in range(len(processedSentences))]
+  for i in range(len(processedSentences)):
+    for j in range(len(processedSentences[i])):
+      processed = processedSentences[i][j]
+      zeros = [0 for _ in range(size)]
+      for id in processed:
+        zeros[id] = 1
+      results[i].append(zeros)
+  print(results[0])
+  return results
         
 def main(_):
   # Import data
@@ -94,4 +131,22 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   #parser.add_argument('--data_dir', type=str, default='/tmp/tensorflow/mnist/input_data', help='Directory for storing input data')
   #FLAGS, unparsed = parser.parse_known_args()
-  tf.app.run(main=main, argv=[])
+  
+  #tf.app.run(main=main, argv=[])
+  #readInData("./commands_train.txt")
+  results, length = convertSentencesToVector([["This is a test", "just a test"],["a test of the outdoor warning system"]])
+  zeroOneEncode(results, length)
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  # A comment to hold the line
