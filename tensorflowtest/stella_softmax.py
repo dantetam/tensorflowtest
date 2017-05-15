@@ -7,8 +7,6 @@ from random import shuffle
 import argparse
 import sys
 
-# from tensorflow.examples.tutorials.mnist import input_data
-
 import tensorflow as tf
 
 from porter_stemmer import PorterStemmer
@@ -121,7 +119,7 @@ def customSoftmaxTrain(dataX, dataLabels, numClasses):
   sess = tf.InteractiveSession()
   tf.global_variables_initializer().run()
   # Train
-  for _ in range(10):
+  for _ in range(50):
     #batch_xs, batch_ys = mnist.train.next_batch(20)
     batch_xs, batch_ys = randomBatch(dataX, dataLabels, 20)
     sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})        
@@ -137,9 +135,6 @@ if __name__ == '__main__':
   #FLAGS, unparsed = parser.parse_known_args()
   
   #tf.app.run(main=main, argv=[])
-  #readInData("./commands_train.txt")
-  #results, length = convertSentencesToVector([["This is a test", "just a test"],["a test of the outdoor warning system"]])
-  #zeroOneEncode(results, length)
   
   fileSentences = readInData("./commands_train.txt")
   numClasses = len(fileSentences)
@@ -160,16 +155,6 @@ if __name__ == '__main__':
       allZeroOneVectors.append(vector)
   
   customSoftmaxTrain(allZeroOneVectors, labels, numClasses)
-  
-  #print(allZeroOneVectors[27])
-  #print(allZeroOneVectors[28])
-  
-  #print(labels[27])  
-  #print(labels[28])  
-  
-  #print(numClasses)
-  #print(zeroOneVector[0][0])
-  #print(len(zeroOneVector[0][0]))
   
   
   

@@ -11,8 +11,10 @@
 *.properties
 *.OBJ
 *.alloc
+/hw01/hw01_data/
 /hw03/hw3_mnist_dist/
 /hw03/hw3_spam_dist/
+/tensorflowtest/tensorflow-master
 *.csv
 *.mat
 *.txt
