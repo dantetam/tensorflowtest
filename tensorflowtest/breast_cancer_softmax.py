@@ -80,23 +80,35 @@ def generateData(originalData, originalLabels, numToGenerate, subsetSelection=2)
     batchX, batchY = randomBatch(malignant, malignantLabels, subsetSelection)
     
     avgPoint = [0 for _ in range(dimensionX)]
+    minData = [9999 for _ in range(dimensionX)]
+    maxData = [-9999 for _ in range(dimensionX)]
     for samplePoint in batchX:
       for i in range(dimensionX):
         avgPoint[i] += samplePoint[i]
+        if samplePoint[i] < minData[i]: minData[i] = samplePoint[i]
+        if samplePoint[i] > maxData[i]: maxData[i] = samplePoint[i]
     for i in range(dimensionX):
       avgPoint[i] /= len(batchX)
-
+      diff = maxData[i] - minData[i]
+      avgPoint[i] += np.random.normal(0, diff / 16.0)
+      
     points.append(avgPoint)
     labels.append([1,0])
     
     batchX, batchY = randomBatch(benign, benignLabels, subsetSelection)
     
     avgPoint = [0 for _ in range(dimensionX)]
+    minData = [9999 for _ in range(dimensionX)]
+    maxData = [-9999 for _ in range(dimensionX)]
     for samplePoint in batchX:
       for i in range(dimensionX):
         avgPoint[i] += samplePoint[i]
+        if samplePoint[i] < minData[i]: minData[i] = samplePoint[i]
+        if samplePoint[i] > maxData[i]: maxData[i] = samplePoint[i]
     for i in range(dimensionX):
       avgPoint[i] /= len(batchX)
+      diff = maxData[i] - minData[i]
+      avgPoint[i] += np.random.normal(0, diff / 16.0)
 
     points.append(avgPoint)
     labels.append([0,1])
@@ -194,16 +206,17 @@ def customSoftmaxTrain(dataX, dataLabels, numClasses, validationPercent, testX, 
   #classification = y.eval(feed_dict)
   #print(classification)
   
-  return x, y, train_acc, valid_acc, fp_percent, fn_percent
+  return x, y, train_acc, valid_acc, fp_percent, fn_percent, W
   
 def main(_):
   dataX, dataY = readData("breast_cancer_data.txt")
+  #dataX = tf.nn.l2_normalize(dataX, 0)
   newPoints, newLabels = generateData(dataX, dataY, 500, 10)
   
   minLoss = 1.0
   bestX, bestY = None, None
   for _ in range(3):
-    trainedX, trainedY, t_acc, v_acc, fp_percent, fn_percent = customSoftmaxTrain(dataX, dataY, 2, 0.2, newPoints, newLabels)
+    trainedX, trainedY, t_acc, v_acc, fp_percent, fn_percent, trainedWeights = customSoftmaxTrain(dataX, dataY, 2, 0.2, newPoints, newLabels)
     loss = fn_percent * 3 + fp_percent
     if loss < minLoss:
       minLoss = loss
