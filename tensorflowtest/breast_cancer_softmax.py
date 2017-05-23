@@ -62,6 +62,11 @@ def generateData(originalData, originalLabels, numToGenerate, subsetSelection=2)
   dimensionX = len(originalData[0])
   dimensionY = len(originalLabels[0])
   
+  malignant = [originalData[i] for i in range(len(originalData)) if originalLabels[i][0] == 1]
+  malignantLabels = [originalLabels[i] for i in range(len(originalData)) if originalLabels[i][0] == 1]
+  benign = [originalData[i] for i in range(len(originalData)) if originalLabels[i][1] == 1]
+  benignLabels = [originalLabels[i] for i in range(len(originalData)) if originalLabels[i][1] == 1]
+  
   def randomBatch(x, y, length):
     indices = [i for i in range(len(x))]
     shuffle(indices)
@@ -71,8 +76,8 @@ def generateData(originalData, originalLabels, numToGenerate, subsetSelection=2)
     return xsubset, ysubset
   
   points, labels = [], []
-  for _ in range(numToGenerate):
-    batchX, batchY = randomBatch(originalData, originalLabels, subsetSelection)
+  for _ in range(int(numToGenerate / 2.0)):
+    batchX, batchY = randomBatch(malignant, malignantLabels, subsetSelection)
     
     avgPoint = [0 for _ in range(dimensionX)]
     for samplePoint in batchX:
@@ -80,26 +85,21 @@ def generateData(originalData, originalLabels, numToGenerate, subsetSelection=2)
         avgPoint[i] += samplePoint[i]
     for i in range(dimensionX):
       avgPoint[i] /= len(batchX)
-    
-    avgLabel = [0 for _ in range(dimensionY)]
-    for samplePoint in batchY:
-      for i in range(dimensionY):
-        avgLabel[i] += samplePoint[i]
-    for i in range(dimensionY):
-      avgLabel[i] /= len(batchY)
-    
-    #maxLabel = tf.argmax(avgLabel)
-    if avgLabel[0] < 0.85 and avgLabel[1] < 0.85:
-      numToGenerate += 1
-      continue
-    
-    if avgLabel[0] > avgLabel[1]:
-      avgLabel = [1,0]
-    else:
-      avgLabel = [0,1]
-    
+
     points.append(avgPoint)
-    labels.append(avgLabel)
+    labels.append([1,0])
+    
+    batchX, batchY = randomBatch(benign, benignLabels, subsetSelection)
+    
+    avgPoint = [0 for _ in range(dimensionX)]
+    for samplePoint in batchX:
+      for i in range(dimensionX):
+        avgPoint[i] += samplePoint[i]
+    for i in range(dimensionX):
+      avgPoint[i] /= len(batchX)
+
+    points.append(avgPoint)
+    labels.append([0,1])
     
   return points, labels
   
@@ -150,9 +150,9 @@ def customSoftmaxTrain(dataX, dataLabels, numClasses, validationPercent, testX, 
   sess = tf.InteractiveSession()
   tf.global_variables_initializer().run()
   # Train
-  for _ in range(1000):
+  for _ in range(1000): #1000
     #batch_xs, batch_ys = mnist.train.next_batch(20)
-    batch_xs, batch_ys = randomBatch(trainX, trainY, 200)
+    batch_xs, batch_ys = randomBatch(trainX, trainY, 200) #200
     sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})        
     
   # Test trained model
@@ -181,8 +181,8 @@ def customSoftmaxTrain(dataX, dataLabels, numClasses, validationPercent, testX, 
   
   print("Training Accuracy: " + str(train_acc))
   print("Validation Accuracy: " + str(valid_acc))
-  print("False Positive Rate (Valid): " + str(fp_percent))
-  print("False Negative Rate (Valid): " + str(fn_percent))
+  print("False Positive Rate (Validation): " + str(fp_percent))
+  print("False Negative Rate (Validation): " + str(fn_percent))
   print("Loss: " + str(fn_percent * 3 + fp_percent))
   print("Speculative Test Accuracy: " + str(test_acc))
   print("------------------------")
