@@ -38,7 +38,7 @@ def quoteCustomSplit(text):
     c_r = text[i+1] if i < len(text) - 1 else None
     if c_i == '"' and c_l != "\\" and firstIndex == -1:
       firstIndex = i
-    elif c_i = '"' and c_r == ',' and firstIndex != -1:
+    elif c_i == '"' and c_r == ',' and firstIndex != -1:
       secondIndex = i
   newText = text[0:firstIndex] + text[firstIndex:secondIndex].replace(",", "") + text[secondIndex:]
   return newText.split(",")
@@ -115,6 +115,11 @@ def linRegTrainTest(dataX, dataLabels, validationPercent, testX, testLabels):
   print('Variance score: %.2f' % regr.score(validationX, validationY))
   
 def main(_):
+  res = quoteCustomSplit('A,long,list,"of,things,to talk",continued')
+  print(res)
+  
+  return
+  
   dataX, dataY = readData("breast_cancer_data.txt")
   #dataX = tf.nn.l2_normalize(dataX, 0)
   newPoints, newLabels = generateData(dataX, dataY, 500, 10)
