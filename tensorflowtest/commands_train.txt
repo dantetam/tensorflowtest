@@ -1,0 +1,186 @@
+# This file represents a parseable body of text for Stella to train on.
+# Ideally Stella learns to associate certain words and phrases and grammatical structures
+# with the associated command.
+#
+# The syntax is as follows:
+#
+# Hashtags denote comments
+# command-name ARGUMENT_1 ARGUMENT_2 ... ARGUMENT_N
+# Text 1
+# Text 2
+# ...
+# Text n
+# <an empty line to denote end of training data>
+
+adventure LOCATION DISTANCE STOPS
+Send me on a new adventure.
+Create a new journey for me.
+Let me explore the world.
+Imagine a journey around my area.
+
+analyze OBJECT
+Analyze this text.
+Run an analysis of this piece of text.
+Read this for me.
+Summarize the details of this article.
+Look into this text.
+
+commands
+List all the possible commands.
+Tell me what the commands are.
+What words do you respond to?
+What are the commands?
+What phrases do you reply to?
+How do I execute commands?
+How do I choose a task to complete?
+
+date
+What is the date?
+Give me the current date.
+What time is it?
+What's the time now?
+When is it?
+
+define OBJECT
+Define this word.
+What does this mean?
+What is the meaning of this?
+Explain this to me.
+Tell me what this means.
+
+email
+Open my email.
+Check my e-mail.
+What's in my inbox?
+Where is my email?
+What emails did I get recently?
+Check my spam folder.
+
+email-write RECIPIENT BODY SUBJECT
+Draft an e-mail.
+Send an email to <RECIPIENT>.
+Write an e-mail to <RECIPIENT>.
+Send an email to <RECIPIENT> with the subject <SUBJECT>.
+Send an email to <RECIPIENT> with the subject <SUBJECT> and body <BODY>.
+
+facebook RECIPIENT BODY
+Open Messenger.
+Let me send a message to <RECIPIENT>.
+Send <BODY> to <RECIPIENT>.
+
+google SUBJECT
+Search Google for <SUBJECT>.
+Find <SUBJECT> on the web.
+Open Google.
+Do a web search for <SUBJECT>.
+
+help
+Help me with this program.
+Help me.
+Provide information about this program.
+What is Stella?
+Who is Stella?
+What does Stella do?
+How do you work?
+What's inside your mind?
+
+integrate OBJECT
+Integrate with the service <OBJECT>.
+Connect with my account on <OBJECT>.
+Use this third-party API in this app.
+Authorize this app <OBJECT> to interface with Stella.
+Interface with <OBJECT>.
+
+jeopardy
+Answer this question for me.
+Can you answer this query?
+Research this question.
+Find an answer to this problem.
+
+memo SUBJECT
+Let me fill out a memo now.
+Record this spending.
+Record this message.
+Fill out a memorandum about <SUBJECT>.
+Create a new file about <SUBJECT>.
+Write an invoice pertaining to <SUBJECT>.
+
+name STRING
+Call me <STRING>.
+My name is <STRING>.
+Please address me as <STRING>.
+<STRING> is my name.
+Can you call me by <STRING>?
+My title is <STRING>.
+
+record
+Record an expense.
+Let me detail my income.
+Let me write about a task.
+Log these notes for me.
+Write down this information and keep it in memory.
+Keep this receipt for me.
+Record this purchase as a receipt.
+Record my receipts.
+
+references
+List all your references.
+What academic papers contribute to Stella?
+Summarize your citations.
+How can I cite Stella?
+What publications do Stella rely on?
+
+research TOPIC
+Let me research about <TOPIC>.
+What can you tell me about <TOPIC>?
+What's the details of <TOPIC>?
+Can you study about <TOPIC>?
+Can you look up some findings about <TOPIC>?
+Can you find some recent academic papers about <TOPIC>?
+
+satellite LOCATION
+Please send me satellite images of my location.
+What does my neighborhood look like?
+What does <LOCATION> look like?
+Show me Google Earth pictures of <LOCATION>.
+Can you provide a physical map of <LOCATION>?
+What is the geography of <LOCATION>?
+Open Google Earth.
+
+schedule TIME DELAY
+Remind me about an event.
+Schedule an appointment for <TIME>.
+Set a timer for <TIME>.
+Set an alarm that goes off at <TIME>.
+Set an alarm that goes off in <DELAY>.
+Give me a reminder at <TIME>.
+Give me a reminder after <DELAY>.
+Write on my calendar about an event.
+
+search-map PLACE
+Search Google Maps for <PLACE>.
+Look for a map around <PLACE>.
+Find a map of places near <PLACE>.
+Show me the roads at <PLACE>.
+Show me major and minor highways at <PLACE>.
+
+stocks OBJECT
+Search for current financial data.
+Look for financial data about <OBJECT>.
+Look up the symbol <OBJECT>.
+Search finance data for <OBJECT>.
+Check Google Finance for a chart of current financial data for <OBJECT>.
+Assess the current business condition of <OBJECT>.
+Please show my finances.
+
+time-series
+Time series.
+
+trello
+Trello.
+
+wikipedia TOPIC
+Look up <TOPIC> in an encyclopedia.
+Search Wikipedia for <TOPIC>.
+Summarize the web results for <TOPIC>.
+Research on Wikipedia this topic.
