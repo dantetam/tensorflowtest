@@ -81,6 +81,80 @@ def encodeSentences(sentences):
     totalResult[sentenceIndex] = vector
     
   return totalResult
+  
+def cnn_model_fn(features, labels, mode, maxLenSentence):
+  """Model function for CNN."""
+  # Input Layer
+  # Reshape X to 4-D tensor: [batch_size, width, height, channels]
+  # MNIST images are 28x28 pixels, and have one color channel
+  input_layer = tf.reshape(features, [-1, maxLenSentence, vectorDim, 1])
+
+  # Convolutional Layer #1
+  # Computes 32 features using a 5x5 filter with ReLU activation.
+  # Padding is added to preserve width and height.
+  # Input Tensor Shape: [batch_size, maxLenSentence, vectorDim, 1]
+  # Output Tensor Shape: [batch_size, maxLenSentence, vectorDim, 8]
+  conv1 = tf.layers.conv2d(
+      inputs=input_layer,
+      filters=8,
+      kernel_size=[1, vectorDim],
+      padding="same",
+      activation=tf.nn.relu)
+
+  # Pooling Layer #1
+  # First max pooling layer with a 2x2 filter and stride of 2
+  # Input Tensor Shape: [batch_size, maxLenSentence, vectorDim, 8]
+  # Output Tensor Shape: [batch_size, maxLenSentence, 1, 8]
+  pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=[1, vectorDim], strides=vectorDim)
+
+  # Flatten tensor into a batch of vectors
+  # Input Tensor Shape: [batch_size, maxLenSentence, 1, 8]
+  # Output Tensor Shape: [batch_size, maxLenSentence * 1 * 8]
+  pool1_flat = tf.reshape(pool2, [-1, maxLenSentence * 1 * 8])
+
+  # Dense Layer
+  # Densely connected layer with 1024 neurons
+  # Input Tensor Shape: [batch_size, maxLenSentence * 1 * 8]
+  # Output Tensor Shape: [batch_size, 8]
+  dense = tf.layers.dense(inputs=pool1_flat, units=8, activation=tf.nn.relu)
+
+  # Add dropout operation; 0.6 probability that element will be kept
+  dropout = tf.layers.dropout(
+      inputs=dense, rate=1-0.6, training=mode == learn.ModeKeys.TRAIN)
+
+  # Logits layer
+  # Input Tensor Shape: [batch_size, 1024]
+  # Output Tensor Shape: [batch_size, 10]
+  logits = tf.layers.dense(inputs=dropout, units=10)
+
+  loss = None
+  train_op = None
+
+  # Calculate Loss (for both TRAIN and EVAL modes)
+  if mode != learn.ModeKeys.INFER:
+    onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=10)
+    loss = tf.losses.softmax_cross_entropy(
+        onehot_labels=onehot_labels, logits=logits)
+
+  # Configure the Training Op (for TRAIN mode)
+  if mode == learn.ModeKeys.TRAIN:
+    train_op = tf.contrib.layers.optimize_loss(
+        loss=loss,
+        global_step=tf.contrib.framework.get_global_step(),
+        learning_rate=0.001,
+        optimizer="SGD")
+
+  # Generate Predictions
+  predictions = {
+      "classes": tf.argmax(
+          input=logits, axis=1),
+      "probabilities": tf.nn.softmax(
+          logits, name="softmax_tensor")
+  }
+
+  # Return a ModelFnOps object
+  return model_fn_lib.ModelFnOps(
+      mode=mode, predictions=predictions, loss=loss, train_op=train_op)
       
 def main(_):
   numFiles = len([name for name in os.listdir('./word2vec/')])
