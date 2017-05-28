@@ -23,7 +23,7 @@ import argparse
 import sys
 
 import tensorflow as tf
-#import numpy as np
+import numpy as np
 
 #from sklearn import datasets, linear_model
 
@@ -51,7 +51,7 @@ def findVectorForWord(word):
         for line in f:
           tokens = line.strip().split(" ")
           if tokens[0] == word:
-            return [float(x) for x in tokens[1:]]
+            return [np.float32(x) for x in tokens[1:]]
   return None    
 
 vectorDim = 300  
@@ -82,7 +82,7 @@ def encodeSentences(sentences):
     
   return totalResult
   
-def cnn_model_fn(features, labels, mode, maxLenSentence):
+def cnn_model_fn(features, labels, maxLenSentence, mode):
   """Model function for CNN."""
   # Input Layer
   # Reshape X to 4-D tensor: [batch_size, width, height, channels]
@@ -116,7 +116,7 @@ def cnn_model_fn(features, labels, mode, maxLenSentence):
   # Densely connected layer with 1024 neurons
   # Input Tensor Shape: [batch_size, maxLenSentence * 1 * 8]
   # Output Tensor Shape: [batch_size, 8]
-  dense = tf.layers.dense(inputs=pool1_flat, units=8, activation=tf.nn.relu)
+  dense = tf.layers.dense(inputs=pool1_flat, units=1024, activation=tf.nn.relu)
 
   # Add dropout operation; 0.6 probability that element will be kept
   dropout = tf.layers.dropout(
@@ -124,8 +124,8 @@ def cnn_model_fn(features, labels, mode, maxLenSentence):
 
   # Logits layer
   # Input Tensor Shape: [batch_size, 1024]
-  # Output Tensor Shape: [batch_size, 10]
-  logits = tf.layers.dense(inputs=dropout, units=10)
+  # Output Tensor Shape: [batch_size, 8]
+  logits = tf.layers.dense(inputs=dropout, units=8)
 
   loss = None
   train_op = None
@@ -160,7 +160,12 @@ def main(_):
   numFiles = len([name for name in os.listdir('./word2vec/')])
   if numFiles == 0:
     readWord2Vec("./word2vec_trained.txt")
-  print(findVectorForWord("Computer_Sciences"))
+  #print(findVectorForWord("Computer_Sciences"))
+  sentences = ["This is a sentence", "another thing"]
+  sentenceVecs = encodeSentences(sentences)
+  labels = [1,0]
+  print(sentenceVecs.shape)
+  cnn_model_fn(sentenceVecs, labels, 4, None)
     
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()

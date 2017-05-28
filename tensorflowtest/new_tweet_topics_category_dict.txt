@@ -1,4 +1,4 @@
-TrumpBudget,P
+﻿TrumpBudget,P
 Checkpoint,C
 Sean_Hannity,P
 WorldTurtleDay,C
@@ -42,3 +42,18 @@ RedNoseDay,T
 2YearsWithSEVENTEEN,T
 25May,T
 TubelightTrailer,C
+Ramadan_Mubarak,C
+YoSoyLibertador,P
+FridayFeeling,T
+FlashbackFriday,T
+Bernardo_Silva,S
+IWakeUpBecause,T
+MemorialDayWeekend,P
+beefban,P
+BuenViernes,T
+Ramazan,C
+26May,P
+ALDUBxDTBYFinale,C
+Wellesley2017,P
+Egipto,P
+PrayForEgypt,P
