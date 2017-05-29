@@ -34,7 +34,7 @@ FLAGS = None
 alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
 combos = [first + second for second in alphabet for first in alphabet]
 
-def readWord2Vec(fname):
+def organizeWord2Vec(fname):
   with open(fname, encoding="latin-1") as f:
     for line in f:
       word = line.strip().split(" ")[0]
@@ -159,13 +159,13 @@ def cnn_model_fn(features, labels, maxLenSentence, mode):
 def main(_):
   numFiles = len([name for name in os.listdir('./word2vec/')])
   if numFiles == 0:
-    readWord2Vec("./word2vec_trained.txt")
+    organizeWord2Vec("./word2vec_trained.txt")
   #print(findVectorForWord("Computer_Sciences"))
   sentences = ["This is a sentence", "another thing"]
   sentenceVecs = encodeSentences(sentences)
   labels = [1,0]
   print(sentenceVecs.shape)
-  cnn_model_fn(sentenceVecs, labels, 4, None)
+  #cnn_model_fn(sentenceVecs, labels, 4, None)
     
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()

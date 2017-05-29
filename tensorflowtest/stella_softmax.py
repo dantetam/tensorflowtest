@@ -8,6 +8,8 @@ import operator
 import argparse
 import sys
 
+import os, os.path
+
 import tensorflow as tf
 
 from porter_stemmer import PorterStemmer
@@ -17,6 +19,30 @@ FLAGS = None
 #TODO: Create a new data set for the sentences
 
 commonWords = []
+
+def separateSentences(fname):
+  with open(fname) as f:
+    content = f.readlines()
+  content = [x.strip() for x in content] 
+
+  workingOnCommand = False
+  id = -1
+  
+  for text in content:
+    if len(text) == 0 or '#' in text: #an empty line, which means a command has stopped
+      workingOnCommand = False
+      continue
+    else:
+      if not workingOnCommand: #beginning a new command
+        workingOnCommand = True
+        id += 1
+      else: #adding sentences to a certain command
+        categoryName = "stellaclass"
+        categoryExtension = "cmd" + str(id)
+        with open('./stellasentences/' + categoryName + "." + categoryExtension,'a',encoding="latin-1") as f2:
+          f2.write(text + "\n")
+    
+  f.close()
 
 def readCommonWords(fname):
   with open(fname) as f:
@@ -176,6 +202,13 @@ if __name__ == '__main__':
   #FLAGS, unparsed = parser.parse_known_args()
   
   #tf.app.run(main=main, argv=[])
+  
+  numFiles = len([name for name in os.listdir('./stellasentences/')])
+  if numFiles == 0:
+    separateSentences("./commands_train.txt")
+    
+  a = [1,2,3]
+  x = a[5]
   
   commonWords = readCommonWords("./common_words.txt")
   fileSentences, commandsById = readInData("./commands_train.txt")
