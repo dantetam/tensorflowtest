@@ -185,7 +185,8 @@ def customSoftmaxTrain(dataX, dataLabels, numClasses):
     sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})        
     
   # Test trained model
-  correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
+  #correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
+  correct_prediction = tf.nn.in_top_k(y, y_, 3);
   accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
   print(sess.run(accuracy, feed_dict={x: dataX, y_: dataLabels}))  
   
@@ -207,9 +208,6 @@ if __name__ == '__main__':
   if numFiles == 0:
     separateSentences("./commands_train.txt")
     
-  a = [1,2,3]
-  x = a[5]
-  
   commonWords = readCommonWords("./common_words.txt")
   fileSentences, commandsById = readInData("./commands_train.txt")
   numClasses = len(fileSentences)
