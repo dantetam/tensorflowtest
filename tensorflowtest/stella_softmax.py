@@ -185,8 +185,8 @@ def customSoftmaxTrain(dataX, dataLabels, numClasses):
     sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})        
     
   # Test trained model
-  #correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
-  correct_prediction = tf.nn.in_top_k(y, y_, 3);
+  correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
+  #correct_prediction = tf.nn.in_top_k(y, y_, 3);
   accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
   print(sess.run(accuracy, feed_dict={x: dataX, y_: dataLabels}))  
   
@@ -214,6 +214,8 @@ if __name__ == '__main__':
   results, length, wordMap = convertSentencesToVector(fileSentences)
   zeroOneVector = zeroOneEncode(results, length)
   
+  print(results)
+  
   labels = []
   for i in range(len(results)):
     for _ in range(len(results[i])):
@@ -229,18 +231,25 @@ if __name__ == '__main__':
   
   trainedCommandModelX, trainedCommandModelY = customSoftmaxTrain(allZeroOneVectors, labels, numClasses)
   
-  testX = [encodeSentence(wordMap, "Please show my finances.")]
+  #testX = [encodeSentence(wordMap, "Please show my finances.")]
   #testX = [encodeSentence(wordMap, "Research on Wikipedia the following topic.")]
-  feed_dict = {trainedCommandModelX: testX}
+  
+  feed_dict = {trainedCommandModelX: allZeroOneVectors}
   classification = trainedCommandModelY.eval(feed_dict)
-  #print(classification)
   
-  classificationLabels = {commandsById[i]: classification[0][i] for i in range(len(classification[0]))}
-  sortedClassificationLabels = sorted(classificationLabels.items(), key=operator.itemgetter(1), reverse=True)
+  print(classification)
   
-  print(sortedClassificationLabels)
+  for sentenceIndex in range(classification.shape[0]):
+    classificationLabels = {commandsById[i]: classification[sentenceIndex][i] for i in range(len(classification[sentenceIndex]))}
+    sortedClassificationLabels = sorted(classificationLabels.items(), key=operator.itemgetter(1), reverse=True)
+  
+    print("True label: " + labels[sentenceIndex] + ", predicted " + sortedClassificationLabels[0][0])
+    print(sortedClassificationLabels)
+    print("-----")
   
   #print(commandsById)
+  
+  
   
   
   
