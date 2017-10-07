@@ -54,7 +54,7 @@ def load_data_from_many_files(listFileNames):
     # Load data from files
     for fileName in listFileNames:
         examples = list(open(fileName, "r").readlines())
-        examples = [s.strip() for s in examples]
+        examples = [s.strip() for s in examples if s.strip()]
         allExamplesLen.append(len(examples))
         x_text = x_text + examples
     # Split by words

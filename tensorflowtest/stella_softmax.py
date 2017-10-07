@@ -11,6 +11,7 @@ import sys
 import os, os.path
 
 import tensorflow as tf
+import numpy as np
 
 from porter_stemmer import PorterStemmer
 
@@ -197,6 +198,34 @@ def customSoftmaxTrain(dataX, dataLabels, numClasses):
   
   return x, y
 
+def manualAccuracy(predicted, actual):
+  assert len(predicted) == len(actual)
+  
+  correct = 0
+  for i in range(len(predicted)):
+    y_hat = predicted[i]
+    y_actual = actual[i]
+    p_hat = max(y_hat.items(), key=operator.itemgetter(1))[0]
+    p_actual = max(y_actual.items(), key=operator.itemgetter(1))[0]
+    if p_hat == p_actual:
+      correct += 1
+  return correct / len(predicted)
+
+def manualTopKthAcc(predicted, actual, k)  
+  assert len(predicted) == len(actual)
+  assert len(predicted) >= k
+  
+  correct = 0
+  for sentenceIndex in range(predicted): 
+    maxClassActual = max(actual.items(), key=operator.itemgetter(1))[0]
+    
+    sortedClassPredicted = sorted(predicted.items(), key=operator.itemgetter(1), reverse=True)
+    setAnswers = [sortedClassPredicted[i][0] for i in range(k)]
+    
+    if maxClassActual in setAnswers:
+      correct += 1
+  return correct / len(predicted)
+   
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   #parser.add_argument('--data_dir', type=str, default='/tmp/tensorflow/mnist/input_data', help='Directory for storing input data')
@@ -239,13 +268,16 @@ if __name__ == '__main__':
   
   print(classification)
   
-  for sentenceIndex in range(classification.shape[0]):
+  for sentenceIndex in range(classification.shape[0]): 
+    trueLabels = {commandsById[i]: labels[sentenceIndex][i] for i in range(len(labels[sentenceIndex]))}
+    sortedTrueLabels = sorted(trueLabels.items(), key=operator.itemgetter(1), reverse=True)
+    
     classificationLabels = {commandsById[i]: classification[sentenceIndex][i] for i in range(len(classification[sentenceIndex]))}
     sortedClassificationLabels = sorted(classificationLabels.items(), key=operator.itemgetter(1), reverse=True)
   
-    print("True label: " + labels[sentenceIndex] + ", predicted " + sortedClassificationLabels[0][0])
-    print(sortedClassificationLabels)
-    print("-----")
+    #print("True label: " + str(trueLabels) + ", predicted " + str(sortedClassificationLabels[0][0]))
+    #print(sortedClassificationLabels)
+    #print("-----")
   
   #print(commandsById)
   
