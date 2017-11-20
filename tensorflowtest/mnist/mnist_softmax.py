@@ -38,8 +38,6 @@ def main(_):
   mnist = input_data.read_data_sets(FLAGS.data_dir, one_hot=True)
   
   testBatchX, testBatchY = mnist.train.next_batch(5)
-  print(testBatchX[0])
-  print(testBatchY[0])
   
   # Create the model
   x = tf.placeholder(tf.float32, [None, 784])

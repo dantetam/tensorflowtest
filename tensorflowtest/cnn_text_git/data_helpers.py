@@ -52,19 +52,25 @@ def load_data_from_many_files(listFileNames):
     x_text = []
     allExamplesLen = []
     # Load data from files
+    # Each file represents a different class of data,
+    # allExamplesLen will contain the number of sentences per class,
+    # and x_text contains the mostly raw sentences themselves.
     for fileName in listFileNames:
         examples = list(open(fileName, "r").readlines())
         examples = [s.strip() for s in examples if s.strip()]
         allExamplesLen.append(len(examples))
         x_text = x_text + examples
     # Split by words
+    # Keep x_text in this format for later use in a word CNN
     x_text = [clean_str(sent) for sent in x_text]
     # Generate labels
     numClasses = len(listFileNames)
     allLabels = []
     for fileNameIndex in range(len(listFileNames)):
+        # Generate the appropriate label for class id <fileNameIndex>
         label = [0 for _ in range(numClasses)]
         label[fileNameIndex] = 1
+        # Copy this label for all number of sentences
         labels = [list(label) for _ in range(allExamplesLen[fileNameIndex])]
         allLabels.append(labels)
     y = np.concatenate(allLabels, 0)
